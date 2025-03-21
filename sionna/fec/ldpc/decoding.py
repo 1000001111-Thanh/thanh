@@ -1160,8 +1160,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
                  **kwargs):
 
         # needs the 5G Encoder to access all 5G parameters
-        assert isinstance(encoder, LDPC5GEncoder), 'encoder must \
-                          be of class LDPC5GEncoder.'
+        # assert isinstance(encoder, LDPC5GEncoder), 'encoder must \
+        #                   be of class LDPC5GEncoder.'
         self._encoder = encoder
         pcm = encoder.pcm
 
@@ -1200,13 +1200,14 @@ class LDPC5GDecoder(LDPCBPDecoder):
                                      - self.encoder.n - 2*self.encoder.z)
             # effective codeword length after pruning of vn-1 nodes
             self._n_pruned = np.max((last_pos, encoder._n_ldpc - nb_punc_bits))
-            self._nb_pruned_nodes = encoder._n_ldpc - self._n_pruned
+            self._nb_pruned_nodes = max(0, encoder._n_ldpc - self._n_pruned)
             # remove last CNs and VNs from pcm
-            pcm = pcm[:-self._nb_pruned_nodes, :-self._nb_pruned_nodes]
+            if self._nb_pruned_nodes > 0:
+                pcm = pcm[:-self._nb_pruned_nodes, :-self._nb_pruned_nodes]
 
             #check for consistency
-            assert(self._nb_pruned_nodes>=0), "Internal error: number of \
-                        pruned nodes must be positive."
+            # assert(self._nb_pruned_nodes>0), "Internal error: number of \
+            #             pruned nodes must be positive."
         else:
             self._nb_pruned_nodes = 0
             # no pruning; same length as before
@@ -1309,11 +1310,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
         nb_punc_bits = ((self.encoder.n_ldpc - k_filler)
                                      - self.encoder.n - 2*self.encoder.z)
 
-
-        llr_5g = tf.concat([llr_5g,
-                   tf.zeros([batch_size, nb_punc_bits - self._nb_pruned_nodes],
-                            self._output_dtype)],
-                            1)
+        if nb_punc_bits - self._nb_pruned_nodes > 0:
+            llr_5g = tf.concat([llr_5g,
+                    tf.zeros([batch_size, nb_punc_bits - self._nb_pruned_nodes],
+                                self._output_dtype)],
+                                1)
 
         # undo shortening (= add 0 positions after k bits, i.e. LLR=LLR_max)
         # the first k positions are the systematic bits

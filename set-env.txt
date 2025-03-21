@@ -1,0 +1,9 @@
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.10 python3.10-venv python3.10-dev
+python3.10 --version
+python3.10 -m venv .venv_python310
+source .venv_python310/bin/activate
+pip install -r requirements.txt

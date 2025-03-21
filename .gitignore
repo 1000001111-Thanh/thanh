@@ -7,7 +7,7 @@ Neural_Receiver-for-PUSCH-5GNR
 *.pkl
 model.*
 *.rar
-.venv
+.venv*
 Pusch_data
 Checkpoint
 TestVector

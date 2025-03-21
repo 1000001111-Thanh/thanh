@@ -77,7 +77,7 @@ class TBDecoder(Layer):
         assert output_dtype in (tf.float16, tf.float32, tf.float64), \
                 "output_dtype must be (tf.float16, tf.float32, tf.float64)."
 
-        assert isinstance(encoder, TBEncoder), "encoder must be TBEncoder."
+        # assert isinstance(encoder, TBEncoder), "encoder must be TBEncoder."
         self._tb_encoder = encoder
 
         self._num_cbs = encoder.num_cbs

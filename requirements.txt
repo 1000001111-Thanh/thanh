@@ -3,6 +3,8 @@ tqdm
 pandas
 pyarrow
 numpy
+ipykernel
+jupyter
 scipy >=1.6.0
 matplotlib >= 3.5.3
 importlib_resources
