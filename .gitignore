@@ -1,4 +1,7 @@
 *.h5
+clickhouse
+Aerial-cuBB-source-24.03.0-Rel-24-3.277/
+ch_*
 *.rar
 */*.txt
 */*.mat

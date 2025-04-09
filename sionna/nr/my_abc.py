@@ -353,6 +353,9 @@ class MySimulator():
         self.Resource_Grid_Mapper._resource_grid.pilot_pattern.pilots = pilots
         """Channel Estimationand Detection will reflect this update since they reference the same object."""
 
+    def update_c_init(self, c_init):
+        self.TB_Encoder.scrambler._c_init = c_init
+        
     @tf.function()
     def sim(self, batch_size, channel_model, no_scaling, gen_prng_seq=None, return_tx_iq=False, return_channel=False):
         if gen_prng_seq:
@@ -391,21 +394,6 @@ class MySimulator():
         b_hat, tb_crc_status = self.TB_Decoder(llr_layer)
 
         return h_hat, x_hat, llr_det, b_hat, tb_crc_status
-    # def build_per(self, cov_mat_time, cov_mat_freq, cov_mat_space=None, order='t-f'):
-
-    #     self.LMMSE_Channel_Estimator = PUSCHLSChannelEstimator(
-    #             self.Resource_Grid_Mapper.resource_grid,
-    #             self.pusch_config.dmrs.length,
-    #             self.pusch_config.dmrs.additional_position,
-    #             self.pusch_config.dmrs.num_cdm_groups_without_data,
-    #             interpolator=LMMSEInterpolator(
-    #                 pilot_pattern=self.Resource_Grid_Mapper._resource_grid.pilot_pattern,
-    #                 cov_mat_time=cov_mat_time,
-    #                 cov_mat_freq=cov_mat_freq,
-    #                 cov_mat_space=cov_mat_space,
-    #                 order=order                            
-    #                 ),
-    #             dtype=tf.complex64)
 
     def per(self, y, h, no):       
         h_hat, err_var = h, 0.
@@ -1131,7 +1119,7 @@ def predict(model, y, r):
     if(padding_size != 0):
         padded_input_size = padded_input_size + padding_size
         inputs = tf.concat([inputs, inputs[:,:padding_size,]],axis=1)
-    inputs = tf.reshape(inputs, [-1,48,14,18])
+    inputs = tf.reshape(inputs, [-1,48,14,2*NUM_RX_ANT+2*NUM_TX_ANT])
 
 
     preds = model(inputs)
@@ -1147,7 +1135,7 @@ def predict(model, y, r):
     
     return preds
 
-def data_reader(file_path, shape=[8,14,-1]):
+def data_reader(file_path, shape=[NUM_RX_ANT,14,-1]):
     """Reads complex int16 data from a binary file."""
     freq = []
     with open(file_path, 'rb') as file:
